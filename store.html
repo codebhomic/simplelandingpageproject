@@ -1,0 +1,124 @@
+
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Premium Clothing Store</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Alpine.js for interactivity -->
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+    .fade-enter {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    .fade-enter-active {
+      transition: all 0.5s ease;
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors duration-500" x-data="storeApp()">
+  <!-- Header -->
+  <header class="flex justify-between items-center p-4 border-b dark:border-gray-700">
+    <h1 class="text-2xl font-bold">Premium Clothing</h1>
+    <button @click="toggleDarkMode" class="px-3 py-1 border rounded dark:border-gray-600">
+      <span x-text="darkMode ? 'Light Mode' : 'Dark Mode'"></span>
+    </button>
+  </header>
+
+  <!-- Slider -->
+  <div class="relative overflow-hidden mt-4">
+    <div class="flex transition-transform duration-700" :style="`transform: translateX(-${currentSlide * 100}%)`">
+      <template x-for="slide in slides" :key="slide">
+        <img :src="slide" class="w-full object-cover h-64">
+      </template>
+    </div>
+    <button @click="prevSlide" class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white dark:bg-gray-800 bg-opacity-70 rounded-full p-2">&larr;</button>
+    <button @click="nextSlide" class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white dark:bg-gray-800 bg-opacity-70 rounded-full p-2">&rarr;</button>
+  </div>
+
+  <!-- Featured Section -->
+  <section class="p-6">
+    <h2 class="text-xl font-semibold mb-4">Featured Products</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      <template x-for="product in displayedProducts" :key="product.id">
+        <div class="border dark:border-gray-700 rounded overflow-hidden shadow hover:shadow-lg transition">
+          <img :src="product.image" class="w-full h-48 object-cover">
+          <div class="p-4">
+            <h3 class="font-bold text-lg" x-text="product.name"></h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400" x-text="product.description"></p>
+            <p class="mt-2 font-semibold" x-text="`$${product.price}`"></p>
+          </div>
+        </div>
+      </template>
+    </div>
+    <div class="text-center mt-6">
+      <button @click="loadMore" x-show="!allLoaded" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">Load More</button>
+    </div>
+  </section>
+
+  <!-- Chat Widget -->
+  <div x-data="{open:false}" class="fixed bottom-4 right-4">
+    <button @click="open = !open" class="bg-blue-600 text-white px-4 py-2 rounded-full shadow hover:bg-blue-700 transition">
+      Chat
+    </button>
+    <div x-show="open" class="mt-2 w-64 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded shadow p-4">
+      <p class="text-sm">Hi! How can we help you?</p>
+      <textarea class="w-full mt-2 p-1 border dark:border-gray-600 rounded"></textarea>
+      <button class="mt-2 w-full bg-blue-600 text-white px-2 py-1 rounded">Send</button>
+    </div>
+  </div>
+
+  <script>
+    function storeApp() {
+      return {
+        darkMode: false,
+        slides: [
+          'http://dummyimage.com/1600x800',
+          'http://dummyimage.com/1600x800',
+          'http://dummyimage.com/1600x800'
+        ],
+        currentSlide: 0,
+        products: [
+          {id:1, name:"Classic Jacket", description:"Warm and stylish.", price:79, image:"http://dummyimage.com/400"},
+          {id:2, name:"Summer Dress", description:"Light and fresh.", price:59, image:"http://dummyimage.com/400"},
+          {id:3, name:"Denim Jeans", description:"Classic fit.", price:69, image:"http://dummyimage.com/400"},
+          {id:4, name:"Sneakers", description:"Comfy and trendy.", price:89, image:"http://dummyimage.com/400"},
+          {id:5, name:"Hoodie", description:"Casual wear.", price:49, image:"http://dummyimage.com/400"},
+          {id:6, name:"Leather Bag", description:"Elegant accessory.", price:120, image:"http://dummyimage.com/400"},
+        ],
+        displayedProducts: [],
+        itemsPerLoad: 3,
+        allLoaded: false,
+        init() {
+          this.displayedProducts = this.products.slice(0, this.itemsPerLoad);
+        },
+        loadMore() {
+          const nextItems = this.products.slice(this.displayedProducts.length, this.displayedProducts.length + this.itemsPerLoad);
+          this.displayedProducts = this.displayedProducts.concat(nextItems);
+          if (this.displayedProducts.length >= this.products.length) {
+            this.allLoaded = true;
+          }
+        },
+        toggleDarkMode() {
+          this.darkMode = !this.darkMode;
+          document.documentElement.classList.toggle('dark', this.darkMode);
+        },
+        nextSlide() {
+          this.currentSlide = (this.currentSlide + 1) % this.slides.length;
+        },
+        prevSlide() {
+          this.currentSlide = (this.currentSlide - 1 + this.slides.length) % this.slides.length;
+        }
+      }
+    }
+  </script>
+</body>
+</html>
